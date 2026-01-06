@@ -9,17 +9,17 @@ public class Dish {
     private List<Ingredients> ingredients;
 
 
+    public Dish(int id, String name, DishTypeEnum dishType) {
+        this.id = id;
+        this.name = name;
+        this.dishType = dishType;
+    }
+
     public Dish(int id, String name, DishTypeEnum dishType, List<Ingredients> ingredients) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
         this.ingredients = ingredients;
-    }
-
-    public Dish(int id, String name, DishTypeEnum dishType) {
-        this.id = id;
-        this.name = name;
-        this.dishType = dishType;
     }
 
     public int getId() {
