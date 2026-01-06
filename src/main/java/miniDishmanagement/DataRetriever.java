@@ -35,6 +35,7 @@ public class DataRetriever {
                     dish));
             }
             dish.setIngredients(listOfIngredient);
+            connection.close();
         }catch(SQLException e){
             throw new RuntimeException(e);
         }
