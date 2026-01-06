@@ -42,8 +42,37 @@ public class DataRetriever {
         return dish;
     }
 
-    List<Ingredients> findIngredients(int page, int size){
-        throw new UnsupportedOperationException("Méthode non disponible");
+    public List<Ingredients> findIngredients(int page, int size){
+        List<Ingredients> listOfIngredients = new ArrayList<>();
+        Connection connection =  new DBConnection().getBDConnection();
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                "SELECT i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
+                "i.category AS ingredient_category, "+
+                "d.id AS dish_id, d.name AS dish_name, dish_type "+
+                "FROM \"Ingredient\" AS i JOIN \"Dish\" AS d ON i.id_dish=d.id "+
+                "LIMIT ? OFFSET ?"
+            );
+            preparedStatement.setInt(1, size);
+            preparedStatement.setInt(2, (page-1)*size);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+                listOfIngredients.add(new Ingredients(
+                    resultSet.getInt("ingredient_id"), 
+                    resultSet.getString("ingredient_name"), 
+                    resultSet.getDouble("ingredient_price"), 
+                    CategoryEnum.valueOf(resultSet.getString("ingredient_category")),
+                    new Dish(
+                        resultSet.getInt("dish_id"),
+                        resultSet.getString("dish_name"),
+                        DishTypeEnum.valueOf(resultSet.getString("dish_type"))
+                    )
+                ));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return listOfIngredients;
     }
 
     List<Ingredients> createIngredients(List<Ingredients> newIngredients){
