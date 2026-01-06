@@ -16,7 +16,11 @@ public class Dish {
         this.ingredients = ingredients;
     }
 
-
+    public Dish(int id, String name, DishTypeEnum dishType) {
+        this.id = id;
+        this.name = name;
+        this.dishType = dishType;
+    }
 
     public int getId() {
         return id;
@@ -69,5 +73,12 @@ public class Dish {
             .stream()
             .mapToDouble(ingredients -> ingredients.getPrice())
             .sum();
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "Dish [id=" + id + ", name=" + name + ", dishType=" + dishType + ", ingredients=" + ingredients + "]";
     }
 }

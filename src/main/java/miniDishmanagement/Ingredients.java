@@ -16,6 +16,14 @@ public class Ingredients {
         this.category = category;
         this.dish = dish;
     }
+
+    public Ingredients(int id, String name, Double price, CategoryEnum category) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.category = category;
+    }
+
     
     public int getId() {
         return id;
@@ -46,6 +54,12 @@ public class Ingredients {
     }
     public void setDish(Dish dish) {
         this.dish = dish;
+    }
+
+    @Override
+    public String toString() {
+        return "Ingredients [id=" + id + ", name=" + name + ", price=" + price + ", category=" + category + ", dish="
+                + dish.getName() + "]";
     }
 
     

@@ -1,7 +1,12 @@
 package com.example;
 
+import miniDishmanagement.DataRetriever;
+import miniDishmanagement.Dish;
+
 public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello world!");
+    void main(String[] args) {
+        DataRetriever dataRetriever = new DataRetriever();
+        Dish dish = dataRetriever.findDishbyId(1);
+        System.out.println(dish);
     }
 }
