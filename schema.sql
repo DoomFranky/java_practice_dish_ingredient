@@ -23,7 +23,7 @@ CREATE TABLE "Ingredient"  (
     "name" VARCHAR(255) NOT NULL,   
     price   NUMERIC(10,2) NOT NULL,
     category "Category_of_ingredient" NOT NULL,
-    id_dish INT NOT NULL,
+    id_dish INT,
     CONSTRAINT fk_id_dish FOREIGN KEY (id_dish) REFERENCES "Dish"(id)
 
 );
