@@ -6,7 +6,7 @@ CREATE TYPE "Type_of_dish" AS ENUM (
 
 CREATE TABLE "Dish" (
     id SERIAL PRIMARY KEY,
-    "name" VARCHAR(255) NOT NULL,
+    "name" VARCHAR(255) NOT NULL UNIQUE,
     dish_type "Type_of_dish" NOT NULL
 );
 
@@ -20,7 +20,7 @@ CREATE TYPE "Category_of_ingredient" AS ENUM (
 
 CREATE TABLE "Ingredient"  (
     id SERIAL PRIMARY KEY,
-    "name" VARCHAR(255) NOT NULL,   
+    "name" VARCHAR(255) NOT NULL UNIQUE,   
     price   NUMERIC(10,2) NOT NULL,
     category "Category_of_ingredient" NOT NULL,
     id_dish INT,
