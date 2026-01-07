@@ -10,7 +10,7 @@ import miniDishmanagement.Ingredients;
 public class Main {
     void main(String[] args) {
         DataRetriever dataRetriever = new DataRetriever();
-        System.out.println(dataRetriever.findDishbyId(1));
+        //System.out.println(dataRetriever.findDishbyId(1));
         //System.out.println(dataRetriever.findDishbyId(999));
         //System.out.println(dataRetriever.findIngredients(2,2));
         //System.out.println(dataRetriever.findIngredients(3,5));
@@ -26,7 +26,8 @@ public class Main {
         listOfIngredient.clear();
         listOfIngredient.add(new Ingredients(6,"Fromage",CategoryEnum.valueOf("DAIRY"), 1200.0));
         listOfIngredient.add(new Ingredients(7,"Oignon",CategoryEnum.valueOf("VEGETABLE"), 500.0));
-        
+
         //System.out.println(dataRetriever.saveDish(new Dish(1,"Salade fraîche", DishTypeEnum.START, listOfIngredient)));
+        System.out.println(dataRetriever.findDishByIngredientName("eur"));
     }
 }

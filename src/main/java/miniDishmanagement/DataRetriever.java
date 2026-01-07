@@ -16,12 +16,12 @@ public class DataRetriever {
             PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, "+
                 "i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
-                "i.category AS ingredient_category FROM \"Dish\" AS d JOIN \"Ingredient\" AS i ON i.id = i.id_dish WHERE d.id = ?"
+                "i.category AS ingredient_category FROM \"Dish\" AS d JOIN \"Ingredient\" AS i ON d.id = i.id_dish WHERE d.id = ?"
             );
             preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Ingredients> listOfIngredient = new ArrayList<>();
-            
+
             while(resultSet.next()){
                 System.out.println("loops");
                 if (dish == null) {
@@ -43,6 +43,8 @@ public class DataRetriever {
             if (dish != null) {
                 dish.setIngredients(listOfIngredient);
             }
+            preparedStatement.close();
+            resultSet.close();
         }catch(SQLException e){
             throw new RuntimeException(e);
         } finally {
@@ -201,18 +203,45 @@ public class DataRetriever {
     }
 
     public List<Dish> findDishByIngredientName(String IngredientName){
+        List<Dish> listOfDish = new ArrayList<>(); 
         DBConnection dbConnection = new DBConnection();
         Connection connection = dbConnection.getBDConnection();
         try{
-            String str = "";
+            String str = "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, "+
+                "i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
+                "i.category AS ingredient_category FROM \"Dish\" AS d JOIN \"Ingredient\" AS i ON d.id = i.id_dish WHERE i.name ILIKE ?";
             PreparedStatement preparedStatement = connection.prepareStatement(str);
-            
+            preparedStatement.setString(1, "%"+IngredientName+"%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Ingredients> listOfIngredients = new ArrayList<>();
+            while(resultSet.next()){
+                Dish dish = new Dish(
+                    resultSet.getInt("dish_id"),
+                    resultSet.getString("dish_name"),
+                    DishTypeEnum.valueOf(resultSet.getString("dish_type").toUpperCase()),
+                    listOfIngredients
+            );
+            while (resultSet.next()) {
+                listOfIngredients.add(new Ingredients(
+                    resultSet.getInt("ingredient_id"), 
+                    resultSet.getString("ingredient_name"), 
+                    resultSet.getDouble("ingredient_price"), 
+                    CategoryEnum.valueOf(resultSet.getString("ingredient_category")),
+                    dish
+                ));
+     
+            }
+            dish.setIngredients(listOfIngredients);
+            listOfDish.add(dish);
+        }
+        preparedStatement.close();
+        resultSet.close();
         }catch (SQLException e){
             throw new RuntimeException(e);
         } finally {
             dbConnection.closeTheConnection(connection);
         }
-        throw new UnsupportedOperationException("Méthode non disponible");
+        return listOfDish;
     }
 
     public List<Ingredients> findIngredientByCriteria(String ingredientName, CategoryEnum category, String dishName, int page, int size){
