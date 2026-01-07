@@ -6,6 +6,7 @@ public class Dish {
     private Integer id;
     private String name;
     private DishTypeEnum dishType;
+    private Double dishPrice; 
     private List<Ingredients> ingredients;
 
 
@@ -15,10 +16,11 @@ public class Dish {
         this.dishType = dishType;
     }
 
-    public Dish(Integer id, String name, DishTypeEnum dishType, List<Ingredients> ingredients) {
+    public Dish(Integer id, String name, DishTypeEnum dishType, Double dishPrice,List<Ingredients> ingredients) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
+        this.dishPrice = dishPrice;
         this.ingredients = ingredients;
     }
 
@@ -79,6 +81,18 @@ public class Dish {
 
     @Override
     public String toString() {
-        return "Dish [id=" + id + ", name=" + name + ", dishType=" + dishType + ", ingredients=" + ingredients + "]";
+        return "Dish [id=" + id + ", name=" + name + ", dishType=" + dishType + " ,dishPrice="+dishPrice+", ingredients=" + ingredients + "]";
+    }
+
+    public Double getDishPrice() {
+        return dishPrice;
+    }
+
+    public void setDishPrice(Double dishPrice) {
+        this.dishPrice = dishPrice;
+    }
+
+    public Double getGrossMargin (){
+        return null
     }
 }
