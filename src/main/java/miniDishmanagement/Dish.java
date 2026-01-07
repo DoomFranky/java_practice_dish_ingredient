@@ -93,6 +93,9 @@ public class Dish {
     }
 
     public Double getGrossMargin (){
-        return null
+        if(this.getDishPrice()==null){
+            throw new RuntimeException("Dish don't have a price");
+        }
+        return this.getDishPrice()-this.getDishCost();
     }
 }
