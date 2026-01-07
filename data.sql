@@ -13,3 +13,9 @@ INSERT INTO "Ingredient" VALUES
     (4, 'Chocolat', 3000.00, 'OTHER', 4),
     (5, 'Beurre', 2500.00, 'DAIRY', 4)
 ;
+
+UPDATE "Dish" SET "DishPrice"= 2000.0 WHERE name='Salade fraîche';
+UPDATE "Dish" SET "DishPrice"= 6000.0 WHERE name='Poulet grillé';
+UPDATE "Dish" SET "DishPrice"= null WHERE name='Riz aux légume';
+UPDATE "Dish" SET "DishPrice"= null WHERE name='Gâteau au chocolat';
+UPDATE "Dish" SET "DishPrice"= null WHERE name='Salade de fruits';

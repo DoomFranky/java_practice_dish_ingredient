@@ -6,9 +6,11 @@ CREATE TYPE "Type_of_dish" AS ENUM (
 
 CREATE TABLE "Dish" (
     id SERIAL PRIMARY KEY,
-    "name" VARCHAR(255) NOT NULL,
+    "name" VARCHAR(255) NOT NULL UNIQUE,
     dish_type "Type_of_dish" NOT NULL
 );
+
+ALTER TABLE "Dish" ADD COLUMN "DishPrice" NUMERIC(10,2);
 
 CREATE TYPE "Category_of_ingredient" AS ENUM (
     'VEGETABLE',
@@ -20,10 +22,11 @@ CREATE TYPE "Category_of_ingredient" AS ENUM (
 
 CREATE TABLE "Ingredient"  (
     id SERIAL PRIMARY KEY,
-    "name" VARCHAR(255) NOT NULL,   
+    "name" VARCHAR(255) NOT NULL UNIQUE,   
     price   NUMERIC(10,2) NOT NULL,
     category "Category_of_ingredient" NOT NULL,
-    id_dish INT NOT NULL,
+    id_dish INT,
     CONSTRAINT fk_id_dish FOREIGN KEY (id_dish) REFERENCES "Dish"(id)
 
 );
+

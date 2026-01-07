@@ -3,28 +3,28 @@ package miniDishmanagement;
 import java.util.List;
 
 public class Dish {
-    private int id;
+    private Integer id;
     private String name;
     private DishTypeEnum dishType;
+    private Double dishPrice; 
     private List<Ingredients> ingredients;
 
 
-    public Dish(int id, String name, DishTypeEnum dishType, List<Ingredients> ingredients) {
+    public Dish(Integer id, String name, DishTypeEnum dishType, Double dishPrice,List<Ingredients> ingredients) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
+        this.dishPrice = dishPrice;
         this.ingredients = ingredients;
     }
 
-
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
 
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -64,10 +64,33 @@ public class Dish {
         this.ingredients = ingredients;
     }
     
-    public Double getDishPrice(){
+    public Double getDishCost(){
         return ingredients
             .stream()
             .mapToDouble(ingredients -> ingredients.getPrice())
             .sum();
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "Dish [id=" + id + ", name=" + name + ", dishType=" + dishType + " ,dishPrice="+dishPrice+", ingredients=" + ingredients + "]";
+    }
+        
+
+    public Double getDishPrice() {
+        return dishPrice;
+    }
+
+    public void setDishPrice(Double dishPrice) {
+        this.dishPrice = dishPrice;
+    }
+
+    public Double getGrossMargin (){
+        if(this.getDishPrice()==null){
+            throw new RuntimeException("Dish don't have a price");
+        }
+        return this.getDishPrice()-this.getDishCost();
     }
 }
