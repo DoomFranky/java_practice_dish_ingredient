@@ -14,7 +14,7 @@ public class DataRetriever {
         Connection connection = dbConnection.getBDConnection();
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, "+
+                "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, "+"d.\"dishPrice\" AS dish_price, "+
                 "i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
                 "i.category AS ingredient_category FROM \"Dish\" AS d JOIN \"Ingredient\" AS i ON d.id = i.id_dish WHERE d.id = ?"
             );
@@ -29,6 +29,7 @@ public class DataRetriever {
                         resultSet.getInt("dish_id"),
                         resultSet.getString("dish_name"),
                         DishTypeEnum.valueOf(resultSet.getString("dish_type").toUpperCase()),
+                        resultSet.getDouble("dish_price"),
                         listOfIngredient
                     );
                 }
@@ -61,7 +62,7 @@ public class DataRetriever {
             PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
                 "i.category AS ingredient_category, "+
-                "d.id AS dish_id, d.name AS dish_name, dish_type "+
+                "d.id AS dish_id, d.name AS dish_name, dish_type ,d.\\\"dishPrice\\\" AS dish_price, "+
                 "FROM \"Ingredient\" AS i JOIN \"Dish\" AS d ON i.id_dish=d.id "+
                 "LIMIT ? OFFSET ?"
             );
@@ -77,7 +78,9 @@ public class DataRetriever {
                     new Dish(
                         resultSet.getInt("dish_id"),
                         resultSet.getString("dish_name"),
-                        DishTypeEnum.valueOf(resultSet.getString("dish_type"))
+                        DishTypeEnum.valueOf(resultSet.getString("dish_type")),
+                        resultSet.getDouble("dish_price"),
+                        listOfIngredients
                     )
                 ));
             }
@@ -139,17 +142,18 @@ public class DataRetriever {
                     "(SELECT MAX(id) FROM \"Ingredient\"))"
                 );
                 udtapeSerial.executeQuery();
-                str = "INSERT INTO \"Dish\" ( name, \"dishType\" ) "+
-                "VALUES ( ? , ? )";
+                str = "INSERT INTO \"Dish\" ( name, \"dishType\", \"dishPrice\" ) "+
+                "VALUES ( ? , ? , ?)";
             }else {
-                str = "UPDATE \"Dish\" SET name = ?, \"dishType\" = ? WHERE id = ?";
+                str = "UPDATE \"Dish\" SET name = ?, \"dishType\" = ? , \"dishPrice\"= ? WHERE id = ?";
             }
             
             PreparedStatement preparedStatement = connection.prepareStatement(str);
             preparedStatement.setString(1, dishToSave.getName());
             preparedStatement.setString(2,dishInDB.getDishType().toString());
+            preparedStatement.setDouble(3,dishInDB.getDishPrice());
             if (str.contains("UPDATE")) {
-                preparedStatement.setInt(3,dishToSave.getId());
+                preparedStatement.setInt(4,dishToSave.getId());
             }
 
             String updateString = "";
@@ -207,7 +211,7 @@ public class DataRetriever {
         DBConnection dbConnection = new DBConnection();
         Connection connection = dbConnection.getBDConnection();
         try{
-            String str = "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, "+
+            String str = "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, d.\"dishPrice\" AS dish_price, "+
                 "i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
                 "i.category AS ingredient_category FROM \"Dish\" AS d JOIN \"Ingredient\" AS i ON d.id = i.id_dish WHERE i.name ILIKE ?";
             PreparedStatement preparedStatement = connection.prepareStatement(str);
@@ -219,6 +223,7 @@ public class DataRetriever {
                     resultSet.getInt("dish_id"),
                     resultSet.getString("dish_name"),
                     DishTypeEnum.valueOf(resultSet.getString("dish_type").toUpperCase()),
+                    resultSet.getDouble("dish_price"),
                     listOfIngredients
             );
             while (resultSet.next()) {
