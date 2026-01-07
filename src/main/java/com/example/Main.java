@@ -5,6 +5,8 @@ import java.util.List;
 
 import miniDishmanagement.CategoryEnum;
 import miniDishmanagement.DataRetriever;
+import miniDishmanagement.Dish;
+import miniDishmanagement.DishTypeEnum;
 import miniDishmanagement.Ingredients;
 
 public class Main {
@@ -16,18 +18,30 @@ public class Main {
         //System.out.println(dataRetriever.findIngredients(3,5));
 
         List<Ingredients> listOfIngredient = new ArrayList<>();
-        listOfIngredient.add(new Ingredients("Fromage",CategoryEnum.valueOf("DAIRY"), 1200.0));
-        listOfIngredient.add(new Ingredients("Oignon",CategoryEnum.valueOf("VEGETABLE"), 500.0));
+        Dish dish = new Dish (1,"Salade fraîche", DishTypeEnum.START, 2000.0,listOfIngredient);
+        listOfIngredient.add(new Ingredients(6,"Fromage",1200.0,CategoryEnum.valueOf("DAIRY"), dish));
+        listOfIngredient.add(new Ingredients(7,"Oignon",500.0,CategoryEnum.valueOf("VEGETABLE"), dish));
         //System.out.println(dataRetriever.createIngredients(listOfIngredient));
         listOfIngredient.clear();
-        listOfIngredient.add(new Ingredients("Carotte",CategoryEnum.valueOf("VEGETABLE"), 2000.0));
-        listOfIngredient.add(new Ingredients("Laitue",CategoryEnum.valueOf("VEGETABLE"), 2000.0));
+        listOfIngredient.add(new Ingredients(5,"Carotte",2000.0,CategoryEnum.valueOf("VEGETABLE"), dish));
+        listOfIngredient.add(new Ingredients(1,"Laitue",2000.0,CategoryEnum.valueOf("VEGETABLE") ,dish));
         //System.out.println(dataRetriever.createIngredients(listOfIngredient));
         listOfIngredient.clear();
-        listOfIngredient.add(new Ingredients(6,"Fromage",CategoryEnum.valueOf("DAIRY"), 1200.0));
-        listOfIngredient.add(new Ingredients(7,"Oignon",CategoryEnum.valueOf("VEGETABLE"), 500.0));
+        listOfIngredient.add(new Ingredients(6,"Fromage", 1200.0,CategoryEnum.valueOf("DAIRY"),dish));
+        listOfIngredient.add(new Ingredients(7,"Oignon", 500.0,CategoryEnum.valueOf("VEGETABLE"),dish));
 
         //System.out.println(dataRetriever.saveDish(new Dish(1,"Salade fraîche", DishTypeEnum.START, listOfIngredient)));
-        System.out.println(dataRetriever.findDishByIngredientName("eur"));
+        //System.out.println(dataRetriever.findDishByIngredientName("eur"));
+        
+        listOfIngredient.clear();
+        listOfIngredient.add(new Ingredients(6,"Fromage",1200.0,CategoryEnum.valueOf("DAIRY"),dish));
+        listOfIngredient.add(new Ingredients(7,"Oignon",500.0,CategoryEnum.valueOf("VEGETABLE"), dish));
+        dish.setIngredients(listOfIngredient);
+        //System.out.println(dish.getDishCost());
+
+        dish = dataRetriever.findDishbyId(1);
+        System.out.println(dish.getGrossMargin());
+
+        dataRetriever.saveDish(dish);
     }
 }

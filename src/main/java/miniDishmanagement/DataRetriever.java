@@ -250,6 +250,97 @@ public class DataRetriever {
     }
 
     public List<Ingredients> findIngredientByCriteria(String ingredientName, CategoryEnum category, String dishName, int page, int size){
-        throw new UnsupportedOperationException("Méthode non disponible");
+        List<Ingredients> listOfIndrIngredients = new ArrayList<>();
+        DBConnection dbConnection =  new DBConnection();
+        Connection connection = dbConnection.getBDConnection();
+        try{
+            String str = "SELECT i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
+                "i.category AS ingredient_category, "+
+                "d.id AS dish_id, d.name AS dish_name, dish_type ,d.\"dishPrice\" AS dish_price, "+
+                "FROM \"Ingredient\" AS i JOIN \"Dish\" AS d ON i.id_dish=d.id ";
+
+            String toAdd = "";
+            if(ingredientName!=null){
+                toAdd += "WHERE i.name ILIKE ?";
+                if (category!=null) {
+                    toAdd += "AND i.category = ?";
+                }
+
+                if (dishName!=null) {
+                    toAdd += "AND d.name = ?";
+                }
+
+            } else if (category!=null) {
+                toAdd+= "WHERE i.category = ?";
+                if (dishName!=null) {
+                    toAdd += "AND d.name ILIKE ?";
+                }
+            } else if (dishName!=null) {
+                toAdd += "WHERE d.name ILIKE ?";
+            }
+
+            toAdd+= "LIMITE ? OFFSET ?";
+            str+=toAdd;
+
+            PreparedStatement preparedStatement = connection.prepareStatement(str);
+            if(ingredientName!=null){
+                preparedStatement.setString(1,ingredientName);
+                if (category==null && dishName==null) {
+                    preparedStatement.setInt(2, size);
+                    preparedStatement.setInt(3, (page-1)*size);
+                }
+                if (category!=null) {
+                    preparedStatement.setString(2,category.toString());
+                }
+                if (dishName == null) {
+                    preparedStatement.setInt(3, size);
+                    preparedStatement.setInt(4, (page-1)*size); 
+                }
+
+                if (dishName!=null && category!=null) {
+                    preparedStatement.setString(3,dishName);
+                    preparedStatement.setInt(4, size);
+                    preparedStatement.setInt(5, (page-1)*size);
+                } else if (category==null) {
+                    preparedStatement.setString(2,dishName);
+                    preparedStatement.setInt(3, size);
+                    preparedStatement.setInt(4, (page-1)*size);
+                }
+            } else if (category!=null) {
+                preparedStatement.setString(1,category.toString());
+                if (dishName!=null) {
+                    preparedStatement.setString(2,dishName);
+                    preparedStatement.setInt(3, size);
+                    preparedStatement.setInt(4, (page-1)*size);
+                }
+            } else if (dishName!=null) {
+                preparedStatement.setString(1,dishName);
+                preparedStatement.setInt(2, size);
+                preparedStatement.setInt(3, (page-1)*size);
+            } else {
+                preparedStatement.setInt(1, size);
+                preparedStatement.setInt(2, (page-1)*size);
+            }
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                listOfIndrIngredients.add(new Ingredients(
+                    resultSet.getInt("ingredient_id"),
+                    resultSet.getString("ingredient_name"),
+                    resultSet.getDouble("ingredient_price"),
+                    CategoryEnum.valueOf(resultSet.getString("ingredientt_category")),
+                    new Dish(
+                        resultSet.getInt("dish_id"),
+                        resultSet.getString("dish_name"),
+                        DishTypeEnum.valueOf(resultSet.getString("dish_type")),
+                        resultSet.getDouble("dish_price"),
+                        listOfIndrIngredients
+                    ))
+                );
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+        return listOfIndrIngredients;
     }
 }

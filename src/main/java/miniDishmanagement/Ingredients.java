@@ -16,20 +16,6 @@ public class Ingredients {
         this.category = category;
         this.dish = dish;
     }
-
-    public Ingredients(Integer id,String name, CategoryEnum category, Double price) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.category = category;
-    }
-
-    public Ingredients(String name, CategoryEnum category, Double price) {
-        this.name = name;
-        this.price = price;
-        this.category = category;
-    }
-
     
     public Integer getId() {
         return id;
@@ -65,7 +51,7 @@ public class Ingredients {
     @Override
     public String toString() {
         return "Ingredients [id=" + id + ", name=" + name + ", price=" + price + ", category=" + category + ", dish="
-                + dish.getName() + "]";
+            + dish.getName() + "]";
     }
 
     

@@ -10,12 +10,6 @@ public class Dish {
     private List<Ingredients> ingredients;
 
 
-    public Dish(Integer id, String name, DishTypeEnum dishType) {
-        this.id = id;
-        this.name = name;
-        this.dishType = dishType;
-    }
-
     public Dish(Integer id, String name, DishTypeEnum dishType, Double dishPrice,List<Ingredients> ingredients) {
         this.id = id;
         this.name = name;
@@ -83,6 +77,7 @@ public class Dish {
     public String toString() {
         return "Dish [id=" + id + ", name=" + name + ", dishType=" + dishType + " ,dishPrice="+dishPrice+", ingredients=" + ingredients + "]";
     }
+        
 
     public Double getDishPrice() {
         return dishPrice;
