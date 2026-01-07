@@ -10,6 +10,8 @@ CREATE TABLE "Dish" (
     dish_type "Type_of_dish" NOT NULL
 );
 
+ALTER TABLE "Dish" ADD COLUMN "DishPrice" NUMERIC(10,2);
+
 CREATE TYPE "Category_of_ingredient" AS ENUM (
     'VEGETABLE',
     'ANIMAL',
@@ -27,3 +29,4 @@ CREATE TABLE "Ingredient"  (
     CONSTRAINT fk_id_dish FOREIGN KEY (id_dish) REFERENCES "Dish"(id)
 
 );
+
