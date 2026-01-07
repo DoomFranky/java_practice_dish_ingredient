@@ -3,32 +3,32 @@ package miniDishmanagement;
 import java.util.List;
 
 public class Dish {
-    private int id;
+    private Integer id;
     private String name;
     private DishTypeEnum dishType;
     private List<Ingredients> ingredients;
 
 
-    public Dish(int id, String name, DishTypeEnum dishType) {
+    public Dish(Integer id, String name, DishTypeEnum dishType) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
     }
 
-    public Dish(int id, String name, DishTypeEnum dishType, List<Ingredients> ingredients) {
+    public Dish(Integer id, String name, DishTypeEnum dishType, List<Ingredients> ingredients) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
         this.ingredients = ingredients;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
 
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

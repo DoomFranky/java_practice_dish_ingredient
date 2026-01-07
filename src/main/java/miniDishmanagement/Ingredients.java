@@ -1,7 +1,7 @@
 package miniDishmanagement;
 
 public class Ingredients {
-    private int id;
+    private Integer id;
     private String name;
     private Double price;
     private CategoryEnum category;
@@ -9,12 +9,19 @@ public class Ingredients {
 
     
     
-    public Ingredients(int id, String name, Double price, CategoryEnum category, Dish dish) {
+    public Ingredients(Integer id, String name, Double price, CategoryEnum category, Dish dish) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.category = category;
         this.dish = dish;
+    }
+
+    public Ingredients(Integer id,String name, CategoryEnum category, Double price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.category = category;
     }
 
     public Ingredients(String name, CategoryEnum category, Double price) {
@@ -24,10 +31,10 @@ public class Ingredients {
     }
 
     
-    public int getId() {
+    public Integer getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
     public String getName() {
