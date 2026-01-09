@@ -22,8 +22,3 @@ UPDATE "Dish" SET "DishPrice" = CASE "name"
     WHEN 'Salade de fruits' THEN null
 END
 WHERE name IN ('Salade fraîche','Poulet grillé','Riz aux légume','Gâteau au chocolat','Salade de fruits');
-
-UPDATE "Dish" SET "DishPrice"= 6000.0 WHERE name='Poulet grillé';
-UPDATE "Dish" SET "DishPrice"= null WHERE name='Riz aux légume';
-UPDATE "Dish" SET "DishPrice"= null WHERE name='Gâteau au chocolat';
-UPDATE "Dish" SET "DishPrice"= null WHERE name='Salade de fruits';
