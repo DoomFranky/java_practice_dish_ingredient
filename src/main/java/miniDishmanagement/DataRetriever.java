@@ -29,7 +29,7 @@ public class DataRetriever {
                         resultSet.getInt("dish_id"),
                         resultSet.getString("dish_name"),
                         DishTypeEnum.valueOf(resultSet.getString("dish_type").toUpperCase()),
-                        resultSet.getDouble("dish_price"),
+                        resultSet.getObject("dish_price") == null ? null : resultSet.getDouble("dish_price"),
                         listOfIngredient
                     );
                 }
@@ -62,7 +62,7 @@ public class DataRetriever {
             PreparedStatement preparedStatement = connection.prepareStatement(
                 "SELECT i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
                 "i.category AS ingredient_category, "+
-                "d.id AS dish_id, d.name AS dish_name, dish_type ,d.\\\"dishPrice\\\" AS dish_price, "+
+                "d.id AS dish_id, d.name AS dish_name, dish_type ,d.\"dishPrice\" AS dish_price, "+
                 "FROM \"Ingredient\" AS i JOIN \"Dish\" AS d ON i.id_dish=d.id "+
                 "LIMIT ? OFFSET ?"
             );
@@ -101,9 +101,7 @@ public class DataRetriever {
                 "SELECT setval(pg_get_serial_sequence('\"Ingredient\"', 'id'), "+
                 "(SELECT MAX(id) FROM \"Ingredient\"))"
             );
-            System.out.println("wait...");
             udtapeSerial.executeQuery();
-            System.out.println("good");
             for (Ingredients ingredient : newIngredients){
                 String str = "INSERT INTO \"Ingredient\" ( name, category, price ) "+
                     "VALUES ( ? , ?::\"Category_of_ingredient\" , ? )";
@@ -118,7 +116,8 @@ public class DataRetriever {
                 preparedStatement.executeUpdate();
             }
             connection.commit();
-            
+            connection.close();
+            udtapeSerial.close();
         }catch (SQLException e){
             throw new RuntimeException(e);
         } finally {
@@ -128,76 +127,67 @@ public class DataRetriever {
     }
 
     public Dish saveDish (Dish dishToSave){
-        Dish dishInDB = findDishbyId(dishToSave.getId());
-        List<Ingredients> ingredientsInDB = dishInDB.getIngredients();
-        List<Ingredients> ingredientsList = dishToSave.getIngredients();
         DBConnection dbConnection = new DBConnection();
         Connection connection = dbConnection.getBDConnection();
         try{
             connection.setAutoCommit(false);
+            
+            PreparedStatement udtapeSerialStatement = connection.prepareStatement(
+                "SELECT setval(pg_get_serial_sequence('\"Dish\"', 'id'), "+
+                "(SELECT MAX(id) FROM \"Dish\"))"
+            );
+            
+            ResultSet serialResultSet = udtapeSerialStatement.executeQuery();
+
+            Integer idDish = null;
+            if (dishToSave.getId()!=null) {
+                idDish = dishToSave.getId();
+            } else if (serialResultSet.next()) {
+                idDish = serialResultSet.getInt("setval");
+            }
             String str = "";
-            if (dishToSave.getId()==null) {
-                PreparedStatement udtapeSerial = connection.prepareStatement(
-                    "SELECT setval(pg_get_serial_sequence('\"Ingredient\"', 'id'), "+
-                    "(SELECT MAX(id) FROM \"Ingredient\"))"
-                );
-                udtapeSerial.executeQuery();
-                str = "INSERT INTO \"Dish\" ( name, \"dishType\", \"dishPrice\" ) "+
-                "VALUES ( ? , ? , ?)";
-            }else {
-                str = "UPDATE \"Dish\" SET name = ?, \"dishType\" = ? , \"dishPrice\"= ? WHERE id = ?";
+            str = "INSERT INTO \"Dish\" ( name, \"dish_type\", \"DishPrice\" ) "+
+                "VALUES ( ? , ?::\"Type_of_dish\" , ? ) ON CONFLICT (name) DO UPDATE SET name = ?, \"dish_type\" = ?::\"Type_of_dish\" , \"DishPrice\"= ?";
+
+            PreparedStatement dishUpdateStatement = connection.prepareStatement(str);
+
+            dishUpdateStatement.setString(1, dishToSave.getName());
+            dishUpdateStatement.setString(2, dishToSave.getDishType().toString());
+            if(dishToSave.getDishPrice()==null){
+                dishUpdateStatement.setNull(3, java.sql.Types.NUMERIC);
+            }else{
+                dishUpdateStatement.setDouble(3, dishToSave.getDishPrice());
+            }
+            dishUpdateStatement.setString(4, dishToSave.getName());
+            dishUpdateStatement.setString(5, dishToSave.getDishType().toString());
+            if(dishToSave.getDishPrice()==null){
+                dishUpdateStatement.setNull(6, java.sql.Types.NUMERIC);
+            }else{
+                dishUpdateStatement.setDouble(6, dishToSave.getDishPrice());
             }
             
-            PreparedStatement preparedStatement = connection.prepareStatement(str);
-            preparedStatement.setString(1, dishToSave.getName());
-            preparedStatement.setString(2,dishInDB.getDishType().toString());
-            preparedStatement.setDouble(3,dishInDB.getDishPrice());
-            if (str.contains("UPDATE")) {
-                preparedStatement.setInt(4,dishToSave.getId());
-            }
+            String updateIngredientString = 
+                "With null_ingredient AS( "+
+                "UPDATE \"Ingredient\" SET id_dish = NULL "+
+                "WHERE id_dish = ? ) "+
+                "UPDATE \"Ingredient\" SET id_dish = ? "+
+                "WHERE id = ANY(?) ";
 
-            String updateString = "";
-            String updateOnNull = "";
-            List<Integer> ingredientsToNull = new ArrayList<>();
-            List<Integer> ingredientsToSave = new ArrayList<>();
+            Integer[] ingredientIdList = dishToSave.getIngredients().stream().map(i->i.getId()).toArray(Integer[]::new);
+            PreparedStatement ingredientUpdateStatement =  connection.prepareStatement(updateIngredientString);
 
-            for(Ingredients ingredientInDB : ingredientsInDB){
-                if (!ingredientsList.contains(ingredientInDB)) {
-                    if (updateOnNull=="") {
-                        updateOnNull+="UPDATE \"Ingredient\" SET id_dish = ? WHERE id IN ( ?";
-                    }else{
-                        updateOnNull+= ", ?";
-                    }
-                    ingredientsToNull.add(ingredientInDB.getId());
-                }else{
-                    if (updateString=="") {
-                        updateString+="UPDATE \"Ingredient\" SET id_dish = ? WHERE id IN ( ?";
-                    }else{
-                        updateString+=", ?";
-                    }
-                    ingredientsToSave.add(ingredientInDB.getId());
-                }
-            }
-            updateOnNull+=" )";
-            updateString+=" )";
-            if (updateOnNull != " )") {
-                PreparedStatement nullUpdateStatement = connection.prepareStatement(updateOnNull);
-                nullUpdateStatement.setNull(1, java.sql.Types.INTEGER);
-                for (int i = 0; i <= ingredientsToNull.size() ; i++ ){
-                    nullUpdateStatement.setInt(i+1, ingredientsToNull.get(i));
-                }
-                nullUpdateStatement.executeUpdate();
-            }
+            ingredientUpdateStatement.setInt(1,idDish);
+            ingredientUpdateStatement.setInt(2,idDish);
+            ingredientUpdateStatement.setArray(3,connection.createArrayOf("INTEGER", ingredientIdList));
 
-            if (updateString != " )") {
-                PreparedStatement updateSaveStatement = connection.prepareStatement(updateString);
-                updateSaveStatement.setInt(1, dishToSave.getId());
-                for (int i = 0; i <= ingredientsToSave.size() ; i++ ){
-                    updateSaveStatement.setInt(i+1, ingredientsToSave.get(i-1));
-                }
-                updateSaveStatement.executeUpdate();
-            }
+            dishUpdateStatement.executeUpdate();
+            ingredientUpdateStatement.executeUpdate();
+
             connection.commit();
+            udtapeSerialStatement.close();
+            serialResultSet.close();
+            dishUpdateStatement.close();
+            ingredientUpdateStatement.close();
         }catch (SQLException e){
             throw new RuntimeException(e);
         } finally {
