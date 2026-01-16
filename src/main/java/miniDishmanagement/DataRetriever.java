@@ -14,9 +14,12 @@ public class DataRetriever {
         Connection connection = dbConnection.getBDConnection();
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, "+"d.\"dishPrice\" AS dish_price, "+
+                "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, d.\"DishPrice\" AS dish_price, "+
                 "i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
-                "i.category AS ingredient_category FROM \"Dish\" AS d JOIN \"Ingredient\" AS i ON d.id = i.id_dish WHERE d.id = ?"
+                "i.category AS ingredient_category FROM \"DishIngredient\" AS di "+
+                "JOIN \"Ingredient\" AS i ON i.id = di.id_ingredient "+
+                "JOIN \"Dish\" AS d ON d.id = di.id_dish "+
+                "WHERE d.id = ?"
             );
             preparedStatement.setInt(1,id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -60,10 +63,11 @@ public class DataRetriever {
         Connection connection = dbConnection.getBDConnection();
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(
-                "SELECT i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
-                "i.category AS ingredient_category, "+
-                "d.id AS dish_id, d.name AS dish_name, dish_type ,d.\"dishPrice\" AS dish_price, "+
-                "FROM \"Ingredient\" AS i JOIN \"Dish\" AS d ON i.id_dish=d.id "+
+                "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, d.\"DishPrice\" AS dish_price, "+
+                "i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
+                "i.category AS ingredient_category FROM \"DishIngredient\" AS di "+
+                "JOIN \"Ingredient\" AS i ON i.id = di.id_ingredient "+
+                "JOIN \"Dish\" AS d ON d.id = di.id_dish "+
                 "LIMIT ? OFFSET ?"
             );
             preparedStatement.setInt(1, size);
@@ -201,22 +205,38 @@ public class DataRetriever {
         DBConnection dbConnection = new DBConnection();
         Connection connection = dbConnection.getBDConnection();
         try{
-            String str = "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, d.\"dishPrice\" AS dish_price, "+
+            String str = "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, d.\"DishPrice\" AS dish_price, "+
                 "i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
-                "i.category AS ingredient_category FROM \"Dish\" AS d JOIN \"Ingredient\" AS i ON d.id = i.id_dish WHERE i.name ILIKE ?";
+                "i.category AS ingredient_category FROM \"DishIngredient\" AS di "+
+                "JOIN \"Ingredient\" AS i ON i.id = di.id_ingredient "+
+                "JOIN \"Dish\" AS d ON d.id = di.id_dish "+
+                "WHERE d.id IN (" +
+                "SELECT ing.id_dish FROM \"Ingredient\" AS ing WHERE ing.name ILIKE ?" +
+                ") ORDER BY d.id DESC";
+
             PreparedStatement preparedStatement = connection.prepareStatement(str);
             preparedStatement.setString(1, "%"+IngredientName+"%");
             ResultSet resultSet = preparedStatement.executeQuery();
             List<Ingredients> listOfIngredients = new ArrayList<>();
+            Dish dish = null;
+            System.out.println(resultSet.last());
             while(resultSet.next()){
-                Dish dish = new Dish(
-                    resultSet.getInt("dish_id"),
-                    resultSet.getString("dish_name"),
-                    DishTypeEnum.valueOf(resultSet.getString("dish_type").toUpperCase()),
-                    resultSet.getDouble("dish_price"),
-                    listOfIngredients
-            );
-            while (resultSet.next()) {
+                if (listOfDish==null) {
+                    dish = new Dish(
+                        resultSet.getInt("dish_id"),
+                        resultSet.getString("dish_name"),
+                        DishTypeEnum.valueOf(resultSet.getString("dish_type").toUpperCase()),
+                        resultSet.getObject("dish_price") == null ? null : resultSet.getDouble("dish_price"),
+                        listOfIngredients
+                    );
+                }else if(listOfDish.getLast().getId() != resultSet.getInt("dish_id")) {
+                    dish.setIngredients(listOfIngredients);
+                    listOfDish.add(dish);
+                } 
+                if (resultSet.next()) {
+                    dish.setIngredients(listOfIngredients);
+                    listOfDish.add(dish);
+                }
                 listOfIngredients.add(new Ingredients(
                     resultSet.getInt("ingredient_id"), 
                     resultSet.getString("ingredient_name"), 
@@ -224,10 +244,6 @@ public class DataRetriever {
                     CategoryEnum.valueOf(resultSet.getString("ingredient_category")),
                     dish
                 ));
-     
-            }
-            dish.setIngredients(listOfIngredients);
-            listOfDish.add(dish);
         }
         preparedStatement.close();
         resultSet.close();
@@ -244,10 +260,11 @@ public class DataRetriever {
         DBConnection dbConnection =  new DBConnection();
         Connection connection = dbConnection.getBDConnection();
         try{
-            String str = "SELECT i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
-                "i.category AS ingredient_category, "+
-                "d.id AS dish_id, d.name AS dish_name, dish_type ,d.\"dishPrice\" AS dish_price, "+
-                "FROM \"Ingredient\" AS i JOIN \"Dish\" AS d ON i.id_dish=d.id ";
+            String str = "SELECT d.id AS dish_id, d.name AS dish_name ,dish_type, d.\"DishPrice\" AS dish_price, "+
+                "i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
+                "i.category AS ingredient_category FROM \"DishIngredient\" AS di "+
+                "JOIN \"Ingredient\" AS i ON i.id = di.id_ingredient "+
+                "JOIN \"Dish\" AS d ON d.id = di.id_dish ";
 
             String toAdd = "";
             if(ingredientName!=null){
