@@ -14,8 +14,40 @@ INSERT INTO "Ingredient" VALUES
     (5, 'Beurre', 2500.00, 'DAIRY', 4)
 ;
 
-UPDATE "Dish" SET "DishPrice"= 2000.0 WHERE name='Salade fraîche';
-UPDATE "Dish" SET "DishPrice"= 6000.0 WHERE name='Poulet grillé';
-UPDATE "Dish" SET "DishPrice"= null WHERE name='Riz aux légume';
-UPDATE "Dish" SET "DishPrice"= null WHERE name='Gâteau au chocolat';
-UPDATE "Dish" SET "DishPrice"= null WHERE name='Salade de fruits';
+UPDATE "Dish" SET "DishPrice" = CASE "name"
+    WHEN 'Salade fraîche' THEN 2000.0
+    WHEN 'Poulet grillé' THEN 6000.0
+    WHEN 'Riz aux légume' THEN null
+    WHEN 'Gâteau au chocolat' THEN null
+    WHEN 'Salade de fruits' THEN null
+END
+WHERE name IN (
+    'Salade fraîche',
+    'Poulet grillé',
+    'Riz aux légume',
+    'Gâteau au chocolat',
+    'Salade de fruits'
+);
+
+INSERT INTO "DishIngredient" VALUES 
+    (1,1,1,0.20,'KG'),
+    (2,1,2,0.15,'KG'),
+    (3,2,3,1.00,'KG'),
+    (4,4,4,0.30,'KG'),
+    (5,4,5,0.20,'KG')
+;
+
+UPDATE "Dish" SET "DishPrice" = CASE "name"
+    WHEN 'Salade fraîche' THEN 3500.0
+    WHEN 'Poulet grillé' THEN 12000.0
+    WHEN 'Riz aux légume' THEN null
+    WHEN 'Gâteau au chocolat' THEN 8000
+    WHEN 'Salade de fruits' THEN null
+END
+WHERE name IN (
+    'Salade fraîche',
+    'Poulet grillé',
+    'Riz aux légume',
+    'Gâteau au chocolat',
+    'Salade de fruits'
+);
