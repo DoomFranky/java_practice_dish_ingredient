@@ -21,4 +21,33 @@ UPDATE "Dish" SET "DishPrice" = CASE "name"
     WHEN 'Gâteau au chocolat' THEN null
     WHEN 'Salade de fruits' THEN null
 END
-WHERE name IN ('Salade fraîche','Poulet grillé','Riz aux légume','Gâteau au chocolat','Salade de fruits');
+WHERE name IN (
+    'Salade fraîche',
+    'Poulet grillé',
+    'Riz aux légume',
+    'Gâteau au chocolat',
+    'Salade de fruits'
+);
+
+INSERT INTO "DishIngredient" VALUES 
+    (1,1,1,0.20,'KG'),
+    (2,1,2,0.15,'KG'),
+    (3,2,3,1.00,'KG'),
+    (4,4,4,0.30,'KG'),
+    (5,4,5,0.20,'KG')
+;
+
+UPDATE "Dish" SET "DishPrice" = CASE "name"
+    WHEN 'Salade fraîche' THEN 3500.0
+    WHEN 'Poulet grillé' THEN 12000.0
+    WHEN 'Riz aux légume' THEN null
+    WHEN 'Gâteau au chocolat' THEN 8000
+    WHEN 'Salade de fruits' THEN null
+END
+WHERE name IN (
+    'Salade fraîche',
+    'Poulet grillé',
+    'Riz aux légume',
+    'Gâteau au chocolat',
+    'Salade de fruits'
+);
