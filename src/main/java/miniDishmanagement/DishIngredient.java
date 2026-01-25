@@ -55,5 +55,12 @@ public class DishIngredient {
         this.ingredeint = ingredeint;
     }
 
+
+    @Override
+    public String toString() {
+        return "DishIngredient [id=" + id + ", dish=" + dish.getName() + ", ingredeint=" + ingredeint.getName() + ", quantity_require="
+                + quantity_require + ", unit_type=" + unit_type + "]";
+    }
+
     
 }

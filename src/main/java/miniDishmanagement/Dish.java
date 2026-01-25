@@ -1,16 +1,18 @@
 package miniDishmanagement;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Dish {
     private Integer id;
     private String name;
     private DishTypeEnum dishType;
     private Double dishPrice; 
-    private List<Ingredients> ingredients;
+    private List<DishIngredient> ingredients;
 
 
-    public Dish(Integer id, String name, DishTypeEnum dishType, Double dishPrice,List<Ingredients> ingredients) {
+
+    public Dish(Integer id, String name, DishTypeEnum dishType, Double dishPrice,List<DishIngredient> ingredients) {
         this.id = id;
         this.name = name;
         this.dishType = dishType;
@@ -18,7 +20,7 @@ public class Dish {
         this.ingredients = ingredients;
     }
 
-    public Dish(String name, DishTypeEnum dishType, Double dishPrice,List<Ingredients> ingredients) {
+    public Dish(String name, DishTypeEnum dishType, Double dishPrice,List<DishIngredient> ingredients) {
         this.name = name;
         this.dishType = dishType;
         this.dishPrice = dishPrice;
@@ -62,19 +64,19 @@ public class Dish {
 
 
     public List<Ingredients> getIngredients() {
-        return ingredients;
+        return ingredients.stream().map(i->i.getIngredeint()).collect(Collectors.toList());
     }
 
 
 
-    public void setIngredients(List<Ingredients> ingredients) {
-        this.ingredients = ingredients;
+    public void setDishIngredients(List<DishIngredient> ingredient) {
+        this.ingredients = ingredient;
     }
     
     public Double getDishCost(){
         return ingredients
             .stream()
-            .mapToDouble(ingredients -> ingredients.getPrice())
+            .mapToDouble(ingredients -> ingredients.getIngredeint().getPrice())
             .sum();
     }
 
