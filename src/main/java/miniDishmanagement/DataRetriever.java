@@ -10,10 +10,12 @@ import java.util.stream.Collectors;
 
 public class DataRetriever {
     public Dish findDishById (Integer id){
+        DBConnection DbConnection = new DBConnection();
+        Connection connection = DbConnection.getBDConnection();
         Dish dish = null;
         try{
-            ResultSet resultSetDish = SQLgetDishById(id);
-            ResultSet resultSetDishIngredient = SQLgetIngredientById(id);
+            ResultSet resultSetDish = SQLgetDishById(id,connection);
+            ResultSet resultSetDishIngredient = SQLgetIngredientById(id,connection);
             List<DishIngredient> listOfDishIngredient = new ArrayList<>();
             while(resultSetDishIngredient.next()){
                 if (dish == null && resultSetDish.next()) {
@@ -51,6 +53,7 @@ public class DataRetriever {
     }
 
     public List<DishIngredient> findDishIngredientByDishId (Integer id){
+
         throw new RuntimeException("methode non implementer");
     }
 
@@ -383,10 +386,8 @@ public class DataRetriever {
         return listOfDishIngredients.stream().map(i->i.getIngredeint()).collect(Collectors.toList());
     }
 
-    private ResultSet SQLgetDishById (Integer id){
+    private ResultSet SQLgetDishById (Integer id,Connection connection){
         ResultSet resultSet = null;
-        DBConnection dbConnection = new DBConnection();
-        Connection connection = dbConnection.getBDConnection();
         String str = 
             "SELECT d.id AS dish_id ,d.name AS dish_name, dish_type, d.\"DishPrice\" AS dish_price FROM \"Dish\" AS d WHERE d.id = ?";
         try{
@@ -395,16 +396,13 @@ public class DataRetriever {
             resultSet = preparedStatement.executeQuery();
         }catch(SQLException e){
             throw new RuntimeException(e);
-        } finally {
-            dbConnection.closeTheConnection(connection);
         }
         return resultSet;
     }
 
-    private ResultSet SQLgetIngredientById (Integer id){
+    private ResultSet SQLgetIngredientById (Integer id,Connection connection){
         ResultSet resultSet = null;
-        DBConnection dbConnection = new DBConnection();
-        Connection connection = dbConnection.getBDConnection();
+
         String str = 
             "SELECT i.id AS ingredient_id, i.name AS ingredient_name, i.price AS ingredient_price, "+
             "i.category AS ingredient_category, quantity_required, unit, di.id AS dish_ingredient_id FROM \"DishIngredient\" AS di "+
@@ -415,8 +413,6 @@ public class DataRetriever {
             resultSet = preparedStatement.executeQuery();
         }catch(SQLException e){
             throw new RuntimeException(e);
-        } finally {
-            dbConnection.closeTheConnection(connection);
         }
         return resultSet;
     }
