@@ -12,6 +12,8 @@ import miniDishmanagement.Ingredients;
 public class Main {
     void main(String[] args) {
         DataRetriever dataRetriever = new DataRetriever();
-        System.out.println(dataRetriever.findDishById(1));
+        List<Ingredients> listOfIngredients = new ArrayList<>();
+        Dish dish = dataRetriever.findDishById(1);
+        System.out.println(dataRetriever.findIngredients(1, 12));
     }
 }

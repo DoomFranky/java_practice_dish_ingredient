@@ -7,6 +7,10 @@ public class DishIngredient {
     private Double quantity_require;
     private Unit_type unit_type;
     
+    public DishIngredient() {
+    }
+
+
     public DishIngredient(Integer id, Dish dish, Ingredients ingredeint, Double quantity_require, Unit_type unit_type) {
         this.id = id;
         this.dish = dish;

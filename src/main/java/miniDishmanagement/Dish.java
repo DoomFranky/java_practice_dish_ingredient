@@ -12,6 +12,9 @@ public class Dish {
 
 
 
+    public Dish() {
+    }
+
     public Dish(Integer id, String name, DishTypeEnum dishType, Double dishPrice,List<DishIngredient> ingredients) {
         this.id = id;
         this.name = name;
@@ -67,9 +70,18 @@ public class Dish {
         return ingredients.stream().map(i->i.getIngredeint()).collect(Collectors.toList());
     }
 
-
+    public List<DishIngredient> getDishIngredients() {
+        return ingredients;
+    }
 
     public void setDishIngredients(List<DishIngredient> ingredient) {
+        if (ingredient == null) {
+            this.ingredients = null;
+            return;
+        }
+        for (int i = 0; i < ingredient.size(); i++) {
+            ingredient.get(i).setDish(this);
+        }
         this.ingredients = ingredient;
     }
     

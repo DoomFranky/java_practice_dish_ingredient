@@ -7,12 +7,14 @@ public class Ingredients {
     private CategoryEnum category;
     private Dish dish;
 
-    public Ingredients(Integer id, String name, Double price, CategoryEnum category, Dish dish) {
+    public Ingredients() {
+    }
+
+    public Ingredients(Integer id, String name, Double price, CategoryEnum category) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.category = category;
-        this.dish = dish;
     }
 
     public Ingredients(String name, Double price, CategoryEnum category) {
@@ -45,20 +47,13 @@ public class Ingredients {
     public void setCategory(CategoryEnum category) {
         this.category = category;
     }
-    public Dish getDish() {
-        return dish;
-    }
-    public void setDish(Dish dish) {
-        this.dish = dish;
-    }
 
     @Override
     public String toString() {
         if (id==null && dish == null) {
             return "Ingredients [name=" + name + ", price=" + price + ", category=" + category +"]";
         }
-        return "Ingredients [id=" + id + ", name=" + name + ", price=" + price + ", category=" + category + ", dish="
-            + dish.getName() + "]";
+        return "Ingredients [id=" + id + ", name=" + name + ", price=" + price + ", category=" + category + "]";
     }
 
     
