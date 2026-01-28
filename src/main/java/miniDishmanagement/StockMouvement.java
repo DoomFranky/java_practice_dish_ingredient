@@ -4,19 +4,29 @@ import java.time.Instant;
 
 public class StockMouvement {
     private Integer id;
+    private Ingredients ingredients;
     private StockValue value;
     private MovementTypeEnum type;
     private Instant creationDateTime;
 
-    
-    public StockMouvement() {
+    public Ingredients getIngredients() {
+        return ingredients;
     }
-    public StockMouvement(Integer id, StockValue value, MovementTypeEnum type, Instant creationDateTime) {
+    public void setIngredients(Ingredients ingredients) {
+        this.ingredients = ingredients;
+    }
+    
+    public StockMouvement(Integer id, Ingredients ingredients, StockValue value, MovementTypeEnum type,
+            Instant creationDateTime) {
         this.id = id;
+        this.ingredients = ingredients;
         this.value = value;
         this.type = type;
         this.creationDateTime = creationDateTime;
     }
+    public StockMouvement() {
+    }
+    
     public Integer getId() {
         return id;
     }
@@ -43,7 +53,7 @@ public class StockMouvement {
     }
     @Override
     public String toString() {
-        return "StockMouvement [id=" + id + ", value=" + value + ", type=" + type + ", creationDateTime="
+        return "StockMouvement [id=" + id +", ingredient=" +ingredients.getName()+", value=" + value + ", type=" + type + ", creationDateTime="
                 + creationDateTime + "]";
     }
 
