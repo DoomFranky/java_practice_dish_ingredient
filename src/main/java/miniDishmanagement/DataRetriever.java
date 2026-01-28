@@ -1,5 +1,6 @@
 package miniDishmanagement;
 
+import java.sql.Timestamp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -231,8 +232,8 @@ public class DataRetriever {
                 dishUpdateStatement.setDouble(6, dishToSave.getDishPrice());
             }
 
-            updateTheSaveRelation(connection,idDish,dishToSave);
-            deteleNotValideRelation(connection,idDish,dishToSave.getDishIngredients().stream().map(i->i.getIngredeint()).collect(Collectors.toList()));
+            updateTheSaveRelationInSaveDish(connection,idDish,dishToSave);
+            deteleNotValideRelationInSaveDish(connection,idDish,dishToSave.getDishIngredients().stream().map(i->i.getIngredeint()).collect(Collectors.toList()));
             dishUpdateStatement.executeUpdate();
 
             connection.commit();
@@ -248,7 +249,7 @@ public class DataRetriever {
         return dishToSave;
     }
 
-    private void deteleNotValideRelation(Connection connection,Integer idDish,List<Ingredients> ingredientToSave) {
+    private void deteleNotValideRelationInSaveDish(Connection connection,Integer idDish,List<Ingredients> ingredientToSave) {
         try{
             String deleteIngredientString = 
                 "DELETE FROM \"DishIngredient\" WHERE id_dish = ? AND id_ingredient NOT IN (%s)";
@@ -271,7 +272,7 @@ public class DataRetriever {
         }
     }
 
-    private void updateTheSaveRelation(Connection connection, Integer idDish, Dish dishToSave) {
+    private void updateTheSaveRelationInSaveDish(Connection connection, Integer idDish, Dish dishToSave) {
         try{
             PreparedStatement udtapeSerialStatement = connection.prepareStatement(
                 "SELECT setval(pg_get_serial_sequence('\"DishIngredient\"', 'id'), "+
@@ -316,7 +317,129 @@ public class DataRetriever {
     }
 
     public Ingredients saveIngredients (Ingredients ingredientsToSave) {
-        throw new RuntimeException("methode non implimenter");
+        DBConnection dbConnection = new DBConnection();
+        Connection connection = dbConnection.getBDConnection();
+        try{
+            connection.setAutoCommit(false);
+            
+            PreparedStatement udtapeSerialStatement = connection.prepareStatement(
+                "SELECT setval(pg_get_serial_sequence('\"Ingredient\"', 'id'), "+
+                "(SELECT MAX(id) FROM \"Ingredient\"))"
+            );
+            
+            ResultSet serialResultSet = udtapeSerialStatement.executeQuery();
+
+            Integer idIngredient = null;
+            if (ingredientsToSave.getId()!=null) {
+                idIngredient = ingredientsToSave.getId();
+            } else if (serialResultSet.next()) {
+                idIngredient = serialResultSet.getInt("setval");
+            }
+            
+            String str = "INSERT INTO \"Dish\" ( name, price , category ) "+
+                "VALUES ( ? , ? , ?::\"Category_of_ingredient\" ) ON CONFLICT (name) DO UPDATE SET name = ?, price = ? , category = ?::\"Category_of_ingredient\" ";
+
+            PreparedStatement ingredientUpdateStatement = connection.prepareStatement(str);
+
+            ingredientUpdateStatement.setString(1, ingredientsToSave.getName());
+            if(ingredientsToSave.getPrice()==null){
+                ingredientUpdateStatement.setNull(2, java.sql.Types.NUMERIC);
+            }else{
+                ingredientUpdateStatement.setDouble(2, ingredientsToSave.getPrice());
+            }
+            ingredientUpdateStatement.setString(3, ingredientsToSave.getCategory().toString());
+            ingredientUpdateStatement.setString(4, ingredientsToSave.getName());
+            if(ingredientsToSave.getPrice()==null){
+                ingredientUpdateStatement.setNull(5, java.sql.Types.NUMERIC);
+            }else{
+                ingredientUpdateStatement.setDouble(5, ingredientsToSave.getPrice());
+            }
+            ingredientUpdateStatement.setString(6, ingredientsToSave.getCategory().toString());
+            ingredientUpdateStatement.executeUpdate();
+
+            updateStockMouvementInIngredient(connection,idIngredient,ingredientsToSave);
+            deteleStockMouvementInIngredient(connection,idIngredient,ingredientsToSave.getStockMouvementList());
+
+            connection.commit();
+            ingredientUpdateStatement.close();
+            udtapeSerialStatement.close();
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }finally{
+            dbConnection.closeTheConnection(connection);
+        }
+        return ingredientsToSave;
+    }
+
+    private void deteleStockMouvementInIngredient(Connection connection, Integer idIngredient,
+            List<StockMouvement> stockMouvementList) {
+        try{
+            String deleteStockMouvementString = 
+                "DELETE FROM \"StockMouvement\" WHERE id_ingredient = ? AND id NOT IN (%s)";
+
+                String inClause = stockMouvementList.stream()
+                .map(i -> "?")
+                .collect(Collectors.joining(","));
+
+            deleteStockMouvementString = String.format(deleteStockMouvementString, inClause);
+            PreparedStatement stockMouvementDeleteStatement = connection.prepareStatement(deleteStockMouvementString);
+            stockMouvementDeleteStatement.setInt(1, idIngredient);
+            int index = 2;
+            for (StockMouvement stockMouvement : stockMouvementList) {
+                stockMouvementDeleteStatement.setInt(index++, stockMouvement.getId());
+            }
+            stockMouvementDeleteStatement.executeUpdate();
+
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+        throw new UnsupportedOperationException("Unimplemented method 'deteleStockMouvementInIngredient'");
+    }
+
+    private void updateStockMouvementInIngredient(Connection connection, Integer idIngredient,
+            Ingredients ingredientsToSave) {
+                try{
+            PreparedStatement udtapeSerialStatement = connection.prepareStatement(
+                "SELECT setval(pg_get_serial_sequence('\"StockMouvement\"', 'id'), "+
+                "(SELECT MAX(id) FROM \"StockMouvement\"))"
+            );
+            ResultSet serialResultSet = udtapeSerialStatement.executeQuery();
+            Integer id = null;
+            if (serialResultSet.next()) {
+                id = serialResultSet.getInt("setval");
+            }
+            String updateStockMouvementString =
+                "WITH upsert AS ("+
+                    "UPDATE \"StockMouvement\" SET id_ingredient = ? "+
+                    "WHERE id = ? "+
+                    "RETURNING *) "+
+                "INSERT INTO \"StockMouvement\" (id,id_ingredient,quantity,unit,type,creation_datetime) "+
+                "SELECT ?,?,?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM upsert)";
+
+            PreparedStatement ingredientUpdateStatement =  connection.prepareStatement(updateStockMouvementString);
+            List<StockMouvement> stockMouvementsToSave = ingredientsToSave.getStockMouvementList();
+
+            for(StockMouvement sm : stockMouvementsToSave){
+                ingredientUpdateStatement.setInt(1,idIngredient);
+                ingredientUpdateStatement.setInt(2, sm.getId());
+                ingredientUpdateStatement.setInt(3, id+1);
+                ingredientUpdateStatement.setInt(4,idIngredient);
+                if (sm.getValue().getQuantity() == null || sm.getValue().getUnit() == null) {
+                    ingredientUpdateStatement.setNull(5, Types.DOUBLE);
+                    ingredientUpdateStatement.setNull(6, Types.OTHER);
+                }else{
+                    ingredientUpdateStatement.setDouble(5, sm.getValue().getQuantity());
+                    ingredientUpdateStatement.setString(6, sm.getValue().getUnit().toString());
+                }
+                ingredientUpdateStatement.setString(7, sm.getType().toString());
+                ingredientUpdateStatement.setTimestamp(8, Timestamp.from(sm.getCreationDateTime()));
+                ingredientUpdateStatement.addBatch();
+            }
+            ingredientUpdateStatement.executeBatch();
+
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 
     public List<Dish> findDishByIngredientName(String IngredientName){
