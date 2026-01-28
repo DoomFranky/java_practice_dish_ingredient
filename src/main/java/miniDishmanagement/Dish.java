@@ -23,13 +23,6 @@ public class Dish {
         this.ingredients = ingredients;
     }
 
-    public Dish(String name, DishTypeEnum dishType, Double dishPrice,List<DishIngredient> ingredients) {
-        this.name = name;
-        this.dishType = dishType;
-        this.dishPrice = dishPrice;
-        this.ingredients = ingredients;
-    }
-
     public Integer getId() {
         return id;
     }

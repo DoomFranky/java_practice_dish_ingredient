@@ -1,28 +1,24 @@
 package miniDishmanagement;
 
+import java.util.List;
+
 public class Ingredients {
     private Integer id;
     private String name;
     private Double price;
     private CategoryEnum category;
-    private Dish dish;
-
+    private List<StockMouvement> stockMouvementList;
+    
     public Ingredients() {
     }
-
-    public Ingredients(Integer id, String name, Double price, CategoryEnum category) {
+    public Ingredients(Integer id, String name, Double price, CategoryEnum category,
+            List<StockMouvement> stockMouvementList) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.category = category;
+        this.stockMouvementList = stockMouvementList;
     }
-
-    public Ingredients(String name, Double price, CategoryEnum category) {
-        this.name = name;
-        this.price = price;
-        this.category = category;
-    }
-    
     public Integer getId() {
         return id;
     }
@@ -47,14 +43,19 @@ public class Ingredients {
     public void setCategory(CategoryEnum category) {
         this.category = category;
     }
-
+    public List<StockMouvement> getStockMouvementList() {
+        return stockMouvementList;
+    }
+    public void setStockMouvementList(List<StockMouvement> stockMouvementList) {
+        this.stockMouvementList = stockMouvementList;
+    }
     @Override
     public String toString() {
-        if (id==null && dish == null) {
-            return "Ingredients [name=" + name + ", price=" + price + ", category=" + category +"]";
-        }
-        return "Ingredients [id=" + id + ", name=" + name + ", price=" + price + ", category=" + category + "]";
+        return "Ingredients [id=" + id + ", name=" + name + ", price=" + price + ", category=" + category
+                + ", stockMouvementList=" + stockMouvementList + "]";
     }
+
+    
 
     
 }
