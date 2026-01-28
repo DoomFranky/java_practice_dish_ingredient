@@ -83,6 +83,7 @@ public class DataRetriever {
                 ingredient.setName(resultSetDishIngredient.getString("ingredient_name"));
                 ingredient.setPrice(resultSetDishIngredient.getDouble("ingredient_price"));
                 CategoryEnum.valueOf(resultSetDishIngredient.getString("ingredient_category"));
+                ingredient.setStockMouvementList(findStockMouvementByIngredientId(resultSetDishIngredient.getInt("ingredient_id")));
 
                 DishIngredient dishIngredient = new DishIngredient();
                 dishIngredient.setId(resultSetDishIngredient.getInt("dish_ingredient_id"));
@@ -145,7 +146,6 @@ public class DataRetriever {
                 stockMouvement.setValue(new StockValue(resultSet.getDouble("quantity"), Unit_type.valueOf(resultSet.getString("unit"))));
                 stockMouvement.setType(MovementTypeEnum.valueOf(resultSet.getString("type")));
                 stockMouvement.setCreationDateTime(Instant.parse(resultSet.getString("creation_datetime")));
-
                 stockMouvements.add(stockMouvement);
             }
             connection.close();
@@ -315,7 +315,7 @@ public class DataRetriever {
         }
     }
 
-    public Ingredients savIngredients (Ingredients ingredientsToSave) {
+    public Ingredients saveIngredients (Ingredients ingredientsToSave) {
         throw new RuntimeException("methode non implimenter");
     }
 
