@@ -47,6 +47,13 @@ public class Ingredients {
         return stockMouvementList;
     }
     public void setStockMouvementList(List<StockMouvement> stockMouvementList) {
+        if (stockMouvementList==null) {
+            this.stockMouvementList = null;
+            return;
+        }
+        for(StockMouvement stockMouvement: stockMouvementList){
+            stockMouvement.setIngredients(this);
+        }
         this.stockMouvementList = stockMouvementList;
     }
     @Override
