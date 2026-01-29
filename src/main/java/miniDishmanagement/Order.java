@@ -12,7 +12,7 @@ public class Order {
         this.id = id;
         this.reference = reference;
         this.creationDateTime = creationDateTime;
-        dishOrder = dishOrder;
+        this.dishOrder = dishOrder;
     }
     public Integer getId() {
         return id;
