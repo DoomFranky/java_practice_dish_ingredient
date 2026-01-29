@@ -1,24 +1,22 @@
 package miniDishmanagement;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Dish {
     private Integer id;
     private String name;
     private DishTypeEnum dishType;
     private Double dishPrice; 
-    private List<Ingredients> ingredients;
+    private List<DishIngredient> ingredients;
 
 
-    public Dish(Integer id, String name, DishTypeEnum dishType, Double dishPrice,List<Ingredients> ingredients) {
-        this.id = id;
-        this.name = name;
-        this.dishType = dishType;
-        this.dishPrice = dishPrice;
-        this.ingredients = ingredients;
+
+    public Dish() {
     }
 
-    public Dish(String name, DishTypeEnum dishType, Double dishPrice,List<Ingredients> ingredients) {
+    public Dish(Integer id, String name, DishTypeEnum dishType, Double dishPrice,List<DishIngredient> ingredients) {
+        this.id = id;
         this.name = name;
         this.dishType = dishType;
         this.dishPrice = dishPrice;
@@ -62,19 +60,28 @@ public class Dish {
 
 
     public List<Ingredients> getIngredients() {
+        return ingredients.stream().map(i->i.getIngredeint()).collect(Collectors.toList());
+    }
+
+    public List<DishIngredient> getDishIngredients() {
         return ingredients;
     }
 
-
-
-    public void setIngredients(List<Ingredients> ingredients) {
-        this.ingredients = ingredients;
+    public void setDishIngredients(List<DishIngredient> ingredient) {
+        if (ingredient == null) {
+            this.ingredients = null;
+            return;
+        }
+        for (int i = 0; i < ingredient.size(); i++) {
+            ingredient.get(i).setDish(this);
+        }
+        this.ingredients = ingredient;
     }
     
     public Double getDishCost(){
         return ingredients
             .stream()
-            .mapToDouble(ingredients -> ingredients.getPrice())
+            .mapToDouble(ingredients -> ingredients.getIngredeint().getPrice()*ingredients.getQuantity_require())
             .sum();
     }
 

@@ -1,26 +1,25 @@
 package miniDishmanagement;
 
+import java.time.Instant;
+import java.util.List;
+
 public class Ingredients {
     private Integer id;
     private String name;
     private Double price;
     private CategoryEnum category;
-    private Dish dish;
-
-    public Ingredients(Integer id, String name, Double price, CategoryEnum category, Dish dish) {
+    private List<StockMouvement> stockMouvementList;
+    
+    public Ingredients() {
+    }
+    public Ingredients(Integer id, String name, Double price, CategoryEnum category,
+            List<StockMouvement> stockMouvementList) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.category = category;
-        this.dish = dish;
+        this.stockMouvementList = stockMouvementList;
     }
-
-    public Ingredients(String name, Double price, CategoryEnum category) {
-        this.name = name;
-        this.price = price;
-        this.category = category;
-    }
-    
     public Integer getId() {
         return id;
     }
@@ -45,21 +44,30 @@ public class Ingredients {
     public void setCategory(CategoryEnum category) {
         this.category = category;
     }
-    public Dish getDish() {
-        return dish;
+    public List<StockMouvement> getStockMouvementList() {
+        return stockMouvementList;
     }
-    public void setDish(Dish dish) {
-        this.dish = dish;
+    public void setStockMouvementList(List<StockMouvement> stockMouvementList) {
+        if (stockMouvementList==null) {
+            this.stockMouvementList = null;
+            return;
+        }
+        for(StockMouvement stockMouvement: stockMouvementList){
+            stockMouvement.setIngredients(this);
+        }
+        this.stockMouvementList = stockMouvementList;
     }
 
+    public StockValue getStockValueAt(Instant t){
+        return stockMouvementList.stream().filter(sm->sm.getCreationDateTime().isBefore(t)).findFirst().orElse(null).getValue();
+    }
     @Override
     public String toString() {
-        if (id==null && dish == null) {
-            return "Ingredients [name=" + name + ", price=" + price + ", category=" + category +"]";
-        }
-        return "Ingredients [id=" + id + ", name=" + name + ", price=" + price + ", category=" + category + ", dish="
-            + dish.getName() + "]";
+        return "Ingredients [id=" + id + ", name=" + name + ", price=" + price + ", category=" + category
+                + ", stockMouvementList=" + stockMouvementList + "]";
     }
+
+    
 
     
 }
