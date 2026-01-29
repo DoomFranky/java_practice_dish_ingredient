@@ -442,6 +442,34 @@ public class DataRetriever {
         }
     }
 
+    public Order findOrderByReference(String reference){
+        DBConnection dbConnection = new DBConnection();
+        Connection connection = dbConnection.getBDConnection();
+
+        try{
+            String str = 
+            "SELECT o.id AS order_id ,o.reference AS reference, , o.creation_datetime AS order_creation_datetime ,quantity, id_dish"+
+            "FROM \"DishOrder\" AS do JOIN \"Order\"AS o ON o.id = do.id_order"+
+            "WHERE o.reference = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(str);
+            preparedStatement.setString(1, reference);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                Order order = new Order();
+                order.setCreationDateTime(resultSet.getTimestamp("order_creation_datetime").toInstant());
+                order.setDishOrder(new DishOrder(, null, null));
+                order.setId(null);
+                order.setReference(reference);
+                order.setTable(null);
+                
+            }
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+        throw new RuntimeException("methode non implementer");
+    }
+
     public List<Dish> findDishByIngredientName(String IngredientName){
         List<Dish> listOfDish = new ArrayList<>(); 
         DBConnection dbConnection = new DBConnection();
