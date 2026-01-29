@@ -7,11 +7,11 @@ INSERT INTO "Dish" VALUES
 ;
 
 INSERT INTO "Ingredient" VALUES
-    (1,'Laitue', 800.00, 'VEGETABLE', 1),
-    (2, 'Tomato', 600.00, 'VEGETABLE', 1),
-    (3, 'Poulet', 4500.00, 'ANIMAL', 2),
-    (4, 'Chocolat', 3000.00, 'OTHER', 4),
-    (5, 'Beurre', 2500.00, 'DAIRY', 4)
+    (1,'Laitue', 800.00, 'VEGETABLE'),
+    (2, 'Tomato', 600.00, 'VEGETABLE'),
+    (3, 'Poulet', 4500.00, 'ANIMAL'),
+    (4, 'Chocolat', 3000.00, 'OTHER'),
+    (5, 'Beurre', 2500.00, 'DAIRY')
 ;
 
 UPDATE "Dish" SET "DishPrice" = CASE "name"

@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,6 +56,7 @@ public class DataRetriever {
                 ingredient.setName(resultSetDishIngredient.getString("ingredient_name"));
                 ingredient.setPrice(resultSetDishIngredient.getDouble("ingredient_price"));
                 CategoryEnum.valueOf(resultSetDishIngredient.getString("ingredient_category"));
+                ingredient.setStockMouvementList(findStockMouvementByIngredientId(id));
             }
             return ingredient;
         }catch(SQLException e){
@@ -146,7 +146,7 @@ public class DataRetriever {
                 stockMouvement.setId(resultSet.getInt("stock_id"));
                 stockMouvement.setValue(new StockValue(resultSet.getDouble("quantity"), Unit_type.valueOf(resultSet.getString("unit"))));
                 stockMouvement.setType(MovementTypeEnum.valueOf(resultSet.getString("type")));
-                stockMouvement.setCreationDateTime(Instant.parse(resultSet.getString("creation_datetime")));
+                stockMouvement.setCreationDateTime(resultSet.getTimestamp("creation_datetime").toInstant());
                 stockMouvements.add(stockMouvement);
             }
             connection.close();

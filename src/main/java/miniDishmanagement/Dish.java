@@ -81,7 +81,7 @@ public class Dish {
     public Double getDishCost(){
         return ingredients
             .stream()
-            .mapToDouble(ingredients -> ingredients.getIngredeint().getPrice())
+            .mapToDouble(ingredients -> ingredients.getIngredeint().getPrice()*ingredients.getQuantity_require())
             .sum();
     }
 

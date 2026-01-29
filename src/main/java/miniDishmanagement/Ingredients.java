@@ -1,5 +1,6 @@
 package miniDishmanagement;
 
+import java.time.Instant;
 import java.util.List;
 
 public class Ingredients {
@@ -55,6 +56,10 @@ public class Ingredients {
             stockMouvement.setIngredients(this);
         }
         this.stockMouvementList = stockMouvementList;
+    }
+
+    public StockValue getStockValueAt(Instant t){
+        return stockMouvementList.stream().filter(sm->sm.getCreationDateTime().isBefore(t)).findFirst().orElse(null).getValue();
     }
     @Override
     public String toString() {

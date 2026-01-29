@@ -1,5 +1,6 @@
 package com.example;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,10 @@ public class Main {
         listofDishIngredients.add(new DishIngredient(null, null, dataRetriever.findIngredientById(6), null, null));
         dish.setDishIngredients(listofDishIngredients);
         
-        System.out.println(dataRetriever.saveDish(dish));
+        //System.out.println(dataRetriever.saveDish(dish));
+        
+        Ingredients ingredients = dataRetriever.findIngredientById(1);
+        Instant t = Instant.now();
+        System.out.println(ingredients.getStockValueAt(t));
     }
 }
